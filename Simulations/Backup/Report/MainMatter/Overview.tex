@@ -1,0 +1,70 @@
+\chapter{Overview}
+\section{Introduction}
+This work aims to be a succesful implementation of an automatic matching
+algorithm for the Ion Cyclotron Resonance Heating (ICRH) antennna, a circuit
+drawing of this matching system is shown in figure \ref{fig:Circuit}.  The antennae are
+facing a plasma with ever changing conditions: the density, temperature and
+even species (He/H/Ar) may vary; As such the capacitance of the various capacitors
+have to be varied every time the conditions change as to maximize power transfer.\\
+
+At the time of writing this is carried out manually by first lowering the
+current going to the antenna by adjusting $C_a$, then varying capacitances of $C_p$ and
+$C_s$, doing a frequency sweep and looking where the power transferred is
+maximal (i.e the measured reflected power is minimal), if the frequency at
+which this happens coincides with the required frequency then we stop
+adjusting $C_s$ and $C_p$ and heighten the current flowing to the antenna using $C_a$.
+\begin{figure}[h]
+\centering
+\begin{circuitikz}[european] \draw
+  (0,0) to [short, *-] (4,0)
+  (4,0) to [vC, l=$C_p$] (4,4)
+  (4,0)  to [short, *-] (6,0)
+  node[ground] (6,0)
+  to [short, *-] (8,0)
+  to [short, *-] (12,0)
+  (0,0) node[below]{$B$} to [open, v^>=$P_s$]  (0,4) 
+  (0,4) node[above]{$A$} to [short, *- ,i=$i_{in}$] (1,4) 
+  (4,4) to [short, *-] (0,4)
+  (4,4) node[above]{$C$} to [vC, l=$C_{s}$] (8,4) 
+  (12,0) to [vC, l=$C_{a}$] (12,4) 
+  (8,4) node[above]{$E$} to [R, l=$Z_{Ant,s}$]  (12,4)
+  (12,4) node[above]{$G$}
+  (4,0) node[below]{$D$}
+  (8,0) node[below]{$F$}
+  (12,0) node[below]{$H$}
+  (8,0) to [R, l=$Z_{Ant,p}$]  (8,4);
+  %\node at (1.5,2) (loop1) {$\ \ \qquad1$}
+  %\draw [->] (loop1.south)arc(-160:160:0.5);
+  %\node at (5.5,2) (loop2) {$\ \ \qquad2$}
+  %\draw [->] (loop2.south)arc(-160:160:0.5);
+  %\node at (9.5,2) (loop3) {$\ \ \qquad3$}
+  %\draw [->] (loop3.south)arc(-160:160:0.5);
+\end{circuitikz}
+\caption{
+The Power input is marked $P_s$, the antenna can be described as having a
+parallel impedence $Z_{Ant,p}$ and a series impedence $Z_{Ant,s}$. The power
+input is assumed to have an entry impedence of $Z_0=50\Omega$ and to match the
+circuit we can play around with the variable parallel matching $C_p$, the
+series matching $C_s$ and the pre-matching $C_a$ capacitors}
+\label{fig:Circuit}
+\end{figure}
+
+\section{Previous work}
+Work has been done on this previously by F. Fasseur\cite{Saussez}, which lays
+out a good exposition on the system, how changing the various capacitors affects the system 
+and which capacitance values of $C_a$ result in a matchable system.\\
+
+K. Elinck continued on this work by implementing a neural network and training it on simulated data\cite{Gen2019},
+we question wether the simulated training corresponds well with the experiment and if it's even needed to make the algorithm
+so complex (as e.g TEXTOR's circuit worked fine\cite{DURODIE1993477} which was just a simple linear algorithm) and as such 
+we won't go into detail on his work.
+\section{system}
+To understand how to, in practice, implement an algorithm, the interconnectedness of the ICRH system needs to be discussed:
+A computer which we'll henceforth call pc1 is connected to an Arduino which can modify the capacitance of the capacitors
+with steppermotors. pc1 is also connected to the ICRH amplifier
+making it possible to select the power.
+
+The DAQ, however, is a second computer: pc2. We can thus set the various
+parameters on pc1 but only see what they imply on pc2, making it necessary to
+transfer data between the two, which makes the automatic matching a little more
+complex.

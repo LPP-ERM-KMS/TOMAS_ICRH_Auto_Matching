@@ -1,0 +1,6 @@
+thesis.*
+texput.*
+*.aux
+*.log
+!thesis.tex
+!thesis.pdf

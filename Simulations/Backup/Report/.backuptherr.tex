@@ -1,0 +1,92 @@
+\section{Error on prediction}
+Running ahead on the actual measurements, let's estimate how accurate our
+predictions will be. Let's label the vertical spatial accuracy,
+i.e how accurately we know the height of these channels, $\delta z$\footnote{meaning if we have a measurement $z_i$ the true value is within $z_i
+\pm \delta z$ with 95\% certainty}. And the timely accuracy, or how accurate the
+vpol timing characteristics are, $\delta t$. If we want to fit n, we first
+minimize the summed correlation function to construct the plane wave. One
+correlation function is given by 
+\begin{equation}
+	Correlation(\theta) := \Delta t - \Delta t' = \Delta t
+	- \frac{\cos\theta \Delta z}{v}
+\end{equation}
+Say the minimum occurs at $Correlation(\theta) = Correlation(\theta_{min}) := \mathcal{C}$, we can then re-write 
+this equation for n:
+\begin{equation}
+  n = \frac{c(\Delta t - \mathcal{C})}{\cos \theta_{min} \Delta z} = \frac{c}{\cos{\theta_{min}}}\left[\frac{\Delta t}{\Delta z} - \frac{\mathcal{C}}{\Delta z}\right]
+\end{equation}
+The $\Delta z$ is the vertical distance between two channels and thus has an error of $2\delta z$ and $\Delta t$ is the time
+difference between two channels, implying an error $2\delta t$. 
+Let's look at the two terms seperately (assuming the error on $\theta_{min}$ to be negligable),
+the first quotient $\phi_1 := \Delta t/\Delta z$ has a variance \cite{grabe2005measurement} of
+\begin{equation}
+	s_{\phi_1}^2 = \frac{1}{{\Delta z}^2}s_{\Delta t}^2 - 2 \frac{{\Delta t}}{{\Delta z}^3}s_{\Delta t \Delta z} + \frac{{\Delta t}^2}{{\Delta z}^4}s_{\Delta z}^2
+\end{equation}
+Assuming $\Delta t$ and $\Delta z$ to be independent:
+\begin{align}
+	s_{\phi_1}^2 &= \frac{1}{{\Delta z}^2}s_{\Delta t}^2 + \frac{{\Delta t}^2}{{\Delta z}^4}s_{\Delta z}^2\\
+	&= 4\left(\frac{1}{{\Delta z}^2}{\delta t}^2 + \frac{{\Delta t}^2}{{\Delta z}^4}{\delta z}^2\right)
+\end{align}
+And the second term ($\phi_2 := -\mathcal{C}/\Delta z$):
+\begin{align}
+	s_{\phi_2}^2 &= \frac{\mathcal{C}^2}{{\Delta z}^2}s_{\Delta t}^2\\
+		     &= 4\frac{\mathcal{C}^2}{{\Delta z}^2}{\delta t}^2\\
+\end{align}
+Our squared variance on the index of refraction is thus (neglecting unknown systematic errors):
+\begin{equation}
+	\delta n^2 =: s_n^2 = 4\left(\frac{c}{\cos{\theta_{min}}}\right)^2 \left( \frac{1}{{\Delta z}^2}{\delta t}^2 + \frac{{\Delta t}^2}{{\Delta z}^4}{\delta z}^2 + 
+\frac{\mathcal{C}^2}{{\Delta z}^2}{\delta t}^2\right)
+\end{equation}
+If we have more than 2 detectors, say N then the uncertainty on the fit can be assumed to be the
+RMS of the individual uncertainties:
+\begin{equation}
+  \delta n =\sqrt{\sum_{i=0}^N \delta n _i^2}
+\end{equation}
+Let's assume $\epsilon$ to be an absolute error.  Now due to this inherent
+inaccuracy, the "global" uncertainty on n also has an additional error of $\pm \epsilon(\vec{r})n$ with
+$\vec{r}$ the position of the balloon.  Our final error on n is thus:
+\begin{equation}
+  \delta n(\vec{r})=  \epsilon(\vec{r})n + \sqrt{\sum_{i=0}^N 4\left(\frac{c}{\cos{\theta_{min}}}\right)^2 \left( \frac{1}{{\Delta z_i}^2}{\delta t}^2 + \frac{{\Delta t_i}^2}{{\Delta z_i}^4}{\delta z}^2 + 
+  \frac{\mathcal{C}_i^2}{{\Delta z_i}^2}{\delta t}^2\right)}
+  \label{eqn:total error}
+\end{equation}
+If we \textbf{assume the $\epsilon$ to overestimate the index of refraction the same way in real
+life as in the simulation} however, our estimated $n$ can be corrected as
+\begin{equation}
+  n_{\text{corrected}} (\vec{r})= \frac{n(\vec{r})}{\epsilon(\vec{r}) + 1}
+\end{equation}
+and our error becomes only the second part of equation \ref{eqn:total error}.
+As the error on the position of the channels is not yet fully known most of
+this section mainly serves as a future reference when people continue this
+work, however it can be safely assumed that the timely error will be of much
+higher importance than the positional error, as we'll get to in section (???).  
+
+The error on timing can be estimated, contrary to the positional error, from the
+sampling rate, as if we have a sampling rate of e.g 3.2GHz then the antenna
+will take a measurement every 
+\begin{equation}
+	\delta t = \frac{1}{3.2\text{GHz}} = 0.3125\text{ns}
+\end{equation}
+So we can predict a measurement of the index of refraction, assuming $\epsilon$
+to be a correction and $\delta z \ll$, to have an error of
+\begin{align}
+	\delta n(\vec{r})_{\text{corrected}}&=  (1+\epsilon)\times\sqrt{\sum_{i=0}^N 4\left(\frac{c}{\cos{\theta_{min}}}\right)^2 \left( \frac{1}{{\Delta z_i}^2}{\delta t}^2 +
+  \frac{\mathcal{C}_i^2}{{\Delta z_i}^2}{\delta t}^2\right) }\\
+					    &=  2(1+\epsilon){\delta t} \times\sqrt{\sum_{i=0}^N \left(\frac{c}{\cos{\theta_{min}}}\right)^2 \left( \frac{1}{{\Delta z_i}^2}+
+  \frac{\mathcal{C}_i^2}{{\Delta z_i}^2}\right) }\\
+					    &=  2(1+\epsilon){\delta t} \times\sqrt{\sum_{i=0}^N \left(\frac{c}{\Delta z_i\cos{\theta_{min}}}\right)^2 \left(1 +
+  \mathcal{C}_i^2\right)}
+  \label{eqn:errorcorr}
+\end{align}
+And if we only consider 2 detectors (which we will in most cases) this reduces
+to
+\begin{equation}
+	\delta n(\vec{r})_{\text{corrected}} = 2(1+\epsilon)\times c\left(\frac{\delta t}{\Delta z}\right) \times\left[\frac{\sqrt{1 +
+	\mathcal{C}^2}}{\cos{\theta_{min}}}\right]
+\end{equation}
+Note again that $\Delta z$ is the \textbf{difference} in height between the two
+detectors and $\delta t$ is the \textbf{accuracy} in timing (which gets
+determined by the sample rate of the antenna).
+
+\newpage
+

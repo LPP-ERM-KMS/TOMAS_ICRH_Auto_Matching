@@ -1,0 +1,134 @@
+\documentclass{report}
+\usepackage{blindtext}
+\usepackage{geometry}
+\usepackage{circuitikz}
+
+%python code
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\geometry{
+ a4paper
+}
+%---------------------------------------------
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+%\usepackage[resetlabels,labeled]{multibib}
+%\newcites{CitedFigure}{Cited Figures}
+%---------------------------------------------
+
+%------
+% Font
+%------
+\pagenumbering{Roman}
+\usepackage[utf8]{inputenc} % allows non-ascii input characters
+\usepackage{lettrine}
+
+\usepackage{slashed}
+\usepackage{braket}
+
+%-----------------------
+% Proper word splitting
+%-----------------------
+\usepackage[english]{babel} 
+\usepackage[parfill]{parskip} 
+
+% Mathematics
+%-------------
+\usepackage{amsmath}
+\usepackage{slashed}
+\usepackage{amsfonts}
+\usepackage{stackengine}
+\def\delequal{\mathrel{\ensurestackMath{\stackon[1pt]{=}{\scriptscriptstyle\Delta}}}}
+\usepackage{mathrsfs}
+
+%---------
+% Figures
+%---------
+\graphicspath{{./figures/}}
+
+%-----------------------
+% Bibliography settings
+%-----------------------
+\usepackage{cite}
+
+% Hyperreferences
+%-----------------
+\usepackage{hyperref}
+
+%--------------------------------------------------
+% Quotes
+%--------------------------------------------------
+\makeatletter
+\renewcommand{\@chapapp}{}
+\newenvironment{chapquote}[2][2em]
+  {\setlength{\@tempdima}{#1}%
+   \def\chapquote@author{#2}%
+   \parshape 1 \@tempdima \dimexpr\textwidth-2\@tempdima\relax%
+   \itshape}
+  {\par\normalfont\hfill--\ \chapquote@author\hspace*{\@tempdima}\par\bigskip}
+\makeatother
+%----------------------
+% Input for title page
+%----------------------
+
+\begin{document}
+
+% =====================================================================
+% Cover
+% =====================================================================
+
+\include{FrontMatter/titel}
+
+% =====================================================================
+% Front matter
+% =====================================================================
+
+\shipout\null
+\newpage
+
+% ------------ TABLE OF CONTENTS ---------
+{\hypersetup{hidelinks}\tableofcontents} % hide link color in toc
+\newpage
+
+% =====================================================================
+% Main matter
+% =====================================================================
+
+\pagenumbering{arabic}
+\include{MainMatter/Overview.tex}
+%\include{MainMatter/Derivation.tex}
+\include{MainMatter/Fred.tex}
+%\include{MainMatter/FreqSWP.tex}
+
+% =====================================================================
+% End matter
+% =====================================================================
+
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,Bibliography/sources}
+
+\end{document}

@@ -1,0 +1,79 @@
+\section{How to proceed}
+There are two ways in which We can proceed:
+\begin{itemize}
+	\item Either we continue on the work of F.Fasseur which means
+		choosing a frequency, measuring various voltages and currents in the line,
+		calculating "error values" and adjusting the capacitors using these error values.
+	\item Or we can automate the previous manual matching procedure
+\end{itemize}
+We'll implement the second option as it might be the easiest, henceforth called \textit{frequency sweep matching} as opposed to the first option which we'll call \textit{error matching}.
+
+\section{Appendix: Technical}
+The ICRH antenna has a matching system consisting of a parallel capacitor, a
+series capacitor and a pre-matching capacitor. These capacitors are variable
+and their capacitance can be manipulated by moving the plates, step motors were
+attached to move these, each connected to an arduino. The arduino has them
+labeled 'S' for the series capacitor in the L-box, 'P' for the parallel
+capacitor in the L-box and 'A' for the pre-matching capacitor and the program
+can be given a command of the form X x Y Y Z z with X,Y,Z in [A,P,S,X,Y,Z]
+(X,Y,Z are, in order, the sample manipulator, the Horizontal triple probe and
+the vertical triple probe) and x,y,z in [1,100] (position of plates in motor
+steps). Their capacitances have ranges\\ 
+$C_a \in \{35-1000pF\}$\\
+$C_s \in \{25-1000pF\}$\\
+$C_p \in \{7-1000pF\}$\\
+. A circuit of
+the ICRH antenna with it's matching boxes is shown below. 
+
+\secion{Matching Code}
+\section{Python code}
+\begin{lstlisting}[language=Python]
+def MatchICRH(self):
+	####################################
+	#            constants             #
+	####################################
+
+	#length from amplifier to voltmeters 1-3
+	l1 = ?
+	l2 = ?
+	l3 = ?
+	#speed of light in m/s
+	c = 299792458
+	# not matched yet
+	matched = False
+
+	if self.matchICRH_entr == "":
+	    print("frequency must be specified")
+	    return
+
+	####################################
+	# move C_a to the correct position #
+	####################################
+	f = self.matchICRH_entr.get()
+	C_a = -3.3094*e-6*f**5 5.17212e-4*f**4 - 5.10998e-2*f**3 + 3.5211*f**2 - 132.074*f + 2000.87 #calculate required capacitance
+	Stepfactor = 10 #amount of steps in a full revolution
+	StepToMoveTo = round(Stepfactor*(0.04781*C_a - 3.68067)) -  self.minPos[0]#The 'A' limits are from minPos to maxPos whilst the original c_a to steps assumes starting at 0
+	cmd = ""
+	cmd += "A " + moveAto + " "
+	if cmd == "":
+	    print("Some error occured whilst trying to move the capacitor")
+	    return
+	# Communicate the desired position to Arduino
+	print(cmd)
+	self.arduino.write(cmd.encode())
+	time.sleep(2) #buffer, 
+	# Retrieve communication from Arduino
+	if "Error" in newPos.decode():
+	    print(newPos.decode())
+	    # After the error, Arduino will communicate the new positions
+	print("Theposition of C_a is:")
+	print(newPos.decode())
+	self.f.write(newPos.decode().strip()+"\n")
+	# Update the information on the GUI
+	posStrs = newPos.decode().split(" ")
+	for i in range(0, len(posStrs)):
+	    if posStrs[i] == "A": #check to make sure, but probably not needed
+		self.posA_lbl.config(text="A: " + posStrs[i + 1].strip())
+
+	#######################################
+\end{lslisting}

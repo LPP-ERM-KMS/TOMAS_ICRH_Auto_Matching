@@ -1,0 +1,62 @@
+This is BibTeX, Version 0.99d (TeX Live 2023/Arch Linux)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+A level-1 auxiliary file: FrontMatter/titel.aux
+A level-1 auxiliary file: MainMatter/Overview.aux
+A level-1 auxiliary file: MainMatter/Fred.aux
+The style file: IEEEtran.bst
+Reallocated singl_function (elt_size=8) to 100 items from 50.
+Reallocated singl_function (elt_size=8) to 100 items from 50.
+Reallocated singl_function (elt_size=8) to 100 items from 50.
+Reallocated wiz_functions (elt_size=8) to 6000 items from 3000.
+Reallocated singl_function (elt_size=8) to 100 items from 50.
+Database file #1: IEEEabrv.bib
+Database file #2: Bibliography/sources.bib
+-- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+Warning--empty booktitle in Gen2019
+
+Done.
+You've used 4 entries,
+            4087 wiz_defined-function locations,
+            1374 strings with 18270 characters,
+and the built_in function-call counts, 2666 in all, are:
+= -- 192
+> -- 55
+< -- 18
++ -- 31
+- -- 9
+* -- 130
+:= -- 409
+add.period$ -- 9
+call.type$ -- 4
+change.case$ -- 6
+chr.to.int$ -- 48
+cite$ -- 5
+duplicate$ -- 190
+empty$ -- 236
+format.name$ -- 12
+if$ -- 605
+int.to.chr$ -- 0
+int.to.str$ -- 4
+missing$ -- 31
+newline$ -- 37
+num.names$ -- 6
+pop$ -- 87
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 2
+skip$ -- 202
+stack$ -- 0
+substring$ -- 116
+swap$ -- 136
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 5
+type$ -- 4
+warning$ -- 1
+while$ -- 11
+width$ -- 5
+write$ -- 57
+(There was 1 warning)
