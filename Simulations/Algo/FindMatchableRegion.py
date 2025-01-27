@@ -8,6 +8,7 @@ from pyRFtk import rfCircuit, rfTRL, rfRLC, rfObject, rfCoupler
 from pyRFtk import plotVSWs
 from scipy.stats import qmc
 from TomasCircuit import ArthurMod
+from TomasCircuit import AntennaAndCaps
 from alive_progress import alive_bar
 from Algos import *
 
@@ -15,7 +16,7 @@ from Algos import *
 Explores the domain and looks at the size of the blue blob and the maximal current running through the capacitors inside the blob
 """
 
-plt.rcParams.update({'font.size': 20})
+plt.rcParams.update({'font.size': 30})
 
 MHz_ = 1e6
 pF_ = 1e-12
@@ -109,7 +110,7 @@ rightmost = (np.abs(CaVals-400-12)).argmin()
 CaVals = CaVals[leftmost:rightmost]
 
 FREQ = 28*MHz_
-SquareLength = 50e-12
+SquareLength = 10e-12
 
 TotalPoints = []
 MaxI = []
@@ -118,9 +119,10 @@ f = open(f'data{int(FREQ/MHz_)}MHz.csv', 'w')
 # create the csv writer
 writer = csv.writer(f)
 
-writer.writerow(["CaVal","Middle CsVal","Middle CpVal","points","MaxI"])
+writer.writerow(["CaVal","Middle CsVal","Middle CpVal","points","ICa","ICp","ICs","MaxI"])
 
 ct = ArthurMod()
+antennact = AntennaAndCaps()
 
 with alive_bar(len(CaVals)*int(5000*SquareLength/1000e-12)*int(5000*SquareLength/1000e-12),title="Finding #Matched/#Total",length=20,bar="filling",spinner="dots_waves2") as bar: #410,402
     for CaVal in CaVals:
@@ -143,7 +145,10 @@ with alive_bar(len(CaVals)*int(5000*SquareLength/1000e-12)*int(5000*SquareLength
         if Gamma < 0.1:
             print(Gamma)
             CpVal,CsVal = CVals[0],CVals[1]
-            bar()
+            #antennact.set('Ca.Cs',CaVal)
+            #antennact.set('Cs.Cs',CsVal)
+            #antennact.set('Cp.Cs',CpVal)
+            #print(antennact.getS(FREQ))
 
             #Define square around point
 
@@ -176,11 +181,11 @@ with alive_bar(len(CaVals)*int(5000*SquareLength/1000e-12)*int(5000*SquareLength
             MaxI.append([0,0,0])
 
         TotalPoints.append(points)
-        writer.writerow([CaVal,CsVal,CpVal,points,MaxI[-1]])
+        writer.writerow([CaVal,CsVal,CpVal,points,MaxI[-1][0],MaxI[-1][1],MaxI[-1][2],max(MaxI[-1])])
         print(f"Ca:{CaVal},Cs:{CsVal},Cp:{CpVal},points:{points},MaxI:{MaxI[-1]}")
         
 f.close()
-COLOR_POINTS = "#69b3a2"
+COLOR_POINTS = "#9e32a8"
 COLOR_CURRENT = "#3399e6"
 
 fig, ax1 = plt.subplots(figsize=(8, 8))

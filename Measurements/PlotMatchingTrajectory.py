@@ -34,7 +34,7 @@ def PlotFile(selection):
         for i,key in enumerate(keys):
             x = data[0]['data'][:,0]
             y = data[0]['data'][:,i]
-            plt.plot(x,y,label=key)
+            plt.plot(x,y,label=f'initial point {i}',linewidth=3)
             plt.xlabel("time (s)")
             plt.ylabel("Voltage")
             plt.legend()

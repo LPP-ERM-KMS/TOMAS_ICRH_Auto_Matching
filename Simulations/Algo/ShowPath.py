@@ -13,7 +13,7 @@ from Algos import *
 MHz_ = 1e6
 pF_ = 1e-12
 
-resolution = 20
+resolution = 80
 maxcp = 500e-12
 maxcs = 200e-12
 mincp = 50e-12
@@ -147,17 +147,17 @@ PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="TEXTOR",color="yellow")[0]
 print(f"2V Steps: {len(Path)}")
 add_arrow(PathPlot)
 
-Path = MatchPath(ModAlgo3V,ct,CsInit,CpInit,FREQ,0,2,3,-1)
+Path = MatchPath(Algo3V,ct,CsInit,CpInit,FREQ,0,2,3,-1)
 PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="3V Algorithm",color="green")[0]
 print(f"Mod3V Steps: {len(Path)}")
 add_arrow(PathPlot)
 
-Path = MatchPath(LazyModAlgo,ct,CsInit,CpInit,FREQ)
+Path = MatchPath(DirCoupler,ct,CsInit,CpInit,FREQ)
 PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="Dir coupler Algorithm",color="purple")[0]
 print(f"Dir coupler Steps: {len(Path)}")
 add_arrow(PathPlot)
 
-Path = MatchPath(ModAlgo4V,ct,CsInit,CpInit,FREQ,0,2,3)
+Path = MatchPath(Algo4V,ct,CsInit,CpInit,FREQ,0,2,3)
 PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="4V Algorithm",color="blue")[0]
 print(f"Mod4V Steps: {len(Path)}")
 add_arrow(PathPlot)

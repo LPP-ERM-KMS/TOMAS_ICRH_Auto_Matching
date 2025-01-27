@@ -24,7 +24,7 @@ def FindRoute(InitialPoint,V1V2Errors,ScaleFactor=0.010):
 fs = np.linspace(25e6,55e6,1000)
 c = 3e8
 
-fig, axs = plt.subplots(2,3,sharex=True,sharey=True)
+#fig, axs = plt.subplots(2,3,sharex=True,sharey=True)
 
 x = np.linspace(0,2.59,1000)
 VoltMeterPositions = np.array([0.235,0.895,1.69,2.35,0]) #added V+/V- as bonus measurement 
@@ -39,8 +39,8 @@ V2V3Errors = []
 
 f = 25e6
 
-for i in np.linspace(-1,1,30):
-    for j in np.linspace(-1,1,30):
+for i in np.linspace(-1,1,20):
+    for j in np.linspace(-1,1,20):
         if i**2 + j**2 > 1:
             continue
         Gamma = i + 1j*j
@@ -128,20 +128,20 @@ for i in np.linspace(-1,1,30):
         EpsGV3V4 = (V[3] - Vf)*C[4] - (V[4] - Vf)*C[3]
 
 
-        #plt.quiver(i,j,EpsAV1V2,EpsGV1V2)
-        axs[0,0].quiver(i,j,EpsGV0V1,EpsAV0V1)
-        axs[0,0].set_title("V0 and V1")
-        axs[0,1].quiver(i,j,EpsGV1V2,EpsAV1V2)
-        axs[0,1].set_title("V1 and V2")
-        axs[0,2].quiver(i,j,EpsGV2V3,EpsAV2V3)
-        axs[0,2].set_title("V2 and V3")
+        plt.quiver(i,j,EpsGV1V2,EpsAV1V2)
+        #axs[0,0].quiver(i,j,EpsGV0V1,EpsAV0V1)
+        #axs[0,0].set_title("V0 and V1")
+        #axs[0,1].quiver(i,j,EpsGV1V2,EpsAV1V2)
+        #axs[0,1].set_title("V1 and V2")
+        #axs[0,2].quiver(i,j,EpsGV2V3,EpsAV2V3)
+        #axs[0,2].set_title("V2 and V3")
 
-        axs[1,0].quiver(i,j,EpsGV0V2,EpsAV0V2)
-        axs[1,0].set_title("V0 and V2")
-        axs[1,1].quiver(i,j,EpsGV1V3,EpsAV1V3)
-        axs[1,1].set_title("V1 and V3")
-        axs[1,2].quiver(i,j,EpsGV0V3,EpsAV0V3)
-        axs[1,2].set_title("V0 and V3")
+        #axs[1,0].quiver(i,j,EpsGV0V2,EpsAV0V2)
+        #axs[1,0].set_title("V0 and V2")
+        #axs[1,1].quiver(i,j,EpsGV1V3,EpsAV1V3)
+        #axs[1,1].set_title("V1 and V3")
+        #axs[1,2].quiver(i,j,EpsGV0V3,EpsAV0V3)
+        #axs[1,2].set_title("V0 and V3")
 
 InitialPoint = 0.4+1j*0.3
 
@@ -173,9 +173,10 @@ axs[0,2].plot(Route[:,0],Route[:,1],color="blue",lw="4")
 
 """
 #plt.title(f"freq = {f/1e6}MHz")
-fig.text(0.5, 0.04, '$\Re\{\Gamma\}$', ha='center')
-fig.text(0.04, 0.5, '$\Im\{\Gamma\}$', va='center', rotation='vertical')
-fig.suptitle(f'u and v using 2V as in TEXTOR', fontsize=16)
+#fig.text(0.5, 0.04, '$\Re\{\Gamma\}$', ha='center')
+#fig.text(0.04, 0.5, '$\Im\{\Gamma\}$', va='center', rotation='vertical')
+#fig.suptitle(f'u and v using 2V as in TEXTOR', fontsize=16)
+plt.title("Linearized algorithm using voltage probes 1 and 2")
+plt.ylabel('$\Im\{\Gamma\}$')
+plt.xlabel('$\Re\{\Gamma\}$')
 plt.show()
-
-

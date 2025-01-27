@@ -14,7 +14,7 @@ from mpl_smithchart import SmithAxes
 MHz_ = 1e6
 pF_ = 1e-12
 
-resolution = 50
+resolution = 12
 maxcs = 1000e-12
 mincs = 7e-12
 mincp = 35e-12
@@ -91,8 +91,8 @@ def MatchAble(algorithm,ct,CpVal,CsVal,FREQ,ProbeIndexA=None,ProbeIndexB=None,Pr
 
         EpsG,EpsB = algorithm(Solution,FREQ,ProbeIndexA,ProbeIndexB,ProbeIndexC)
         
-        CsVal += EpsG*1*pF_
-        CpVal += EpsB*1*pF_
+        CsVal += EpsG*5*pF_
+        CpVal += EpsB*5*pF_
 
         i += 1
 

@@ -19,7 +19,8 @@ plt.rcParams.update({'font.size': 20})
 MHz_ = 1e6
 pF_ = 1e-12
 
-resolution = 50
+linewidth=3
+resolution = 100
 maxcp = 1000e-12
 maxcs = 1000e-12
 mincp = 7e-12
@@ -27,15 +28,21 @@ mincs = 25e-12
 
 #y -axis:
 CsVals = np.linspace(mincs,maxcs,resolution)#capacitor is defined in steps
-#leftmost = (np.abs(CsVals-650e-12)).argmin()
-#rightmost = (np.abs(CsVals-1000e-12)).argmin()
-#CsVals = CsVals[leftmost:rightmost]
+csmin = 100
+csmax = 240
+cpmin = 300
+cpmax = 900
+leftmost = (np.abs(CsVals-csmin*1e-12)).argmin()
+rightmost = (np.abs(CsVals-csmax*1e-12)).argmin()
+CsVals = CsVals[leftmost:rightmost]
+CsVals = np.linspace(csmin*1e-12,csmax*1e-12,resolution)#capacitor is defined in steps
 
 #x -axis:
 CpVals = np.linspace(mincp,maxcp,resolution)#capacitor is defined in steps
-#leftmost = (np.abs(CpVals-600e-12)).argmin()
-#rightmost = (np.abs(CpVals-900e-12)).argmin()
-#CpVals = CpVals[leftmost:rightmost]
+leftmost = (np.abs(CpVals-cpmin*1e-12)).argmin()
+rightmost = (np.abs(CpVals-cpmax*1e-12)).argmin()
+CpVals = CpVals[leftmost:rightmost]
+CpVals = np.linspace(cpmin*1e-12,cpmax*1e-12,resolution)#capacitor is defined in steps
 
 U = []
 V = []
@@ -45,7 +52,7 @@ def PathLength(X):
     for i,point in enumerate(X[:-1]):
         pathlength += np.linalg.norm(point - X[i+1])
     return pathlength
-def add_arrow(line, position=None, direction='right', size=15, color=None):
+def add_arrow(line, position=None, direction='right', size=35, color=None):
     """
     add an arrow to a line.
 
@@ -84,7 +91,7 @@ def MatchPath(algorithm,ct,CpVal,CsVal,FREQ,ProbeIndexA=None,ProbeIndexB=None,Pr
     i = 0
     matched = False
     Path = []
-    while ((i < 5000) and not matched):
+    while ((i < 30000) and not matched):
         
         Path.append(np.array([CpVal,CsVal])/pF_)
 
@@ -119,14 +126,14 @@ def MatchPath(algorithm,ct,CpVal,CsVal,FREQ,ProbeIndexA=None,ProbeIndexB=None,Pr
 
         EpsG,EpsB = algorithm(Solution,FREQ,ProbeIndexA,ProbeIndexB,ProbeIndexC)
 
-        SPFactor = 5
+        SPFactor = 1
         if np.abs(Gamma)<0.1:
             SPFactor = 1
 
         if not phasefactor: phasefactor = 0 #here to test capacitor dependences on Y
 
-        CsVal += np.cos(phasefactor)*SPFactor*EpsG*1*pF_ - np.sin(phasefactor)*SPFactor*EpsB*1*pF_
-        CpVal += np.sin(phasefactor)*SPFactor*EpsG*1*pF_ + np.cos(phasefactor)*SPFactor*EpsB*1*pF_
+        CsVal += EpsG*SPFactor*pF_ #- 0.1*EpsB*1*pF_ # try 
+        CpVal += EpsB*SPFactor*pF_
 
         i += 1
 
@@ -158,36 +165,37 @@ with alive_bar(len(CsVals)*len(CpVals),title="Making colormap",length=20,bar="fi
 X, Y = np.meshgrid(CpVals/pF_,CsVals/pF_) 
 Gammas = np.array(Gammas)
 Z = np.abs(Gammas).reshape(len(CsVals),len(CpVals)) #put into shape with x length CsVals and y length CpVals
-levels = np.linspace(0.0, 1.0, 11)
-CS = plt.contourf(X, Y, Z, levels=levels, cmap=cm.coolwarm, extend='min')
-colorbar = plt.colorbar(CS)
+levels = np.linspace(0.0, 1.0, 100)
+CS = plt.imshow(Z, cmap="hot",extent=[cpmin,cpmax,csmin,csmax],origin='lower',aspect=(cpmax-cpmin)/(csmax-csmin))
+colorbar = plt.colorbar(CS,ticks=np.linspace(0,1,11))
+colorbar.set_label("     $\mid\Gamma\mid$",rotation=0)
 plt.ylabel("Cs (pF)")
 plt.xlabel("Cp (pF)")
 plt.title(f"Ca = {round(CaVal/pF_,2)}pF, Freq= {FREQ/MHz_}MHz")
 
-CpInit = 500*pF_
-CsInit = 150*pF_
+CpInit = 850*pF_
+CsInit = 200*pF_
 
 Path = MatchPath(Algo2V,ct,CpInit,CsInit,FREQ,0,3)
-PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="TEXTOR",color="yellow")[0]
+PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="TEXTOR",color="purple",linewidth=linewidth)[0]
 print(f"2V Steps: {len(Path)}")
 print(f"2V Path length (pF): {PathLength(Path)}pF")
 add_arrow(PathPlot)
 
 Path = MatchPath(Algo3V,ct,CpInit,CsInit,FREQ,0,2,3)
-PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="3V Algorithm",color="green",linestyle=(5, (5, 3)))[0]
+PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="3V Algorithm",color="green",linestyle=(5, (5, 3)),linewidth=linewidth)[0]
 print(f"3V Steps: {len(Path)}")
 print(f"3V Path length (pF): {PathLength(Path)}pF")
 add_arrow(PathPlot)
 
 Path = MatchPath(DirCoupler,ct,CpInit,CsInit,FREQ,0,2,3)
-PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="Dir coupler Algorithm",color="black",linestyle=(3, (5, 3)))[0]
+PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="Dir coupler Algorithm",color="black",linestyle=(3, (5, 3)),linewidth=linewidth)[0]
 print(f"Dir Coupler Steps: {len(Path)}")
 print(f"Dir Path length (pF): {PathLength(Path)}pF")
 add_arrow(PathPlot)
 
 Path = MatchPath(Algo4V,ct,CpInit,CsInit,FREQ,0,2,3)
-PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="4V Algorithm",color="blue",linestyle=(1, (5, 3)))[0]
+PathPlot = plt.plot(Path[:, 0], Path[:, 1],label="4V Algorithm",color="blue",linestyle=(1, (5, 3)),linewidth=linewidth)[0]
 print(f"4V Steps: {len(Path)}")
 print(f"4V Path length (pF): {PathLength(Path)}pF")
 add_arrow(PathPlot)
@@ -199,16 +207,16 @@ plt.show()
 ax = plt.subplot(1, 1, 1, projection='smith')
 
 Path = MatchPath(Algo2V,ct,CpInit,CsInit,FREQ,0,3)
-plt.plot(gammas,label='TEXTOR',color="yellow")
+plt.plot(gammas,label='TEXTOR',color="purple",linewidth=linewidth)
 
 Path = MatchPath(Algo3V,ct,CpInit,CsInit,FREQ,0,2,3,-1)
-plt.plot(gammas,label='3V Algorithm',color="green",linestyle=(5, (5, 3)))
+plt.plot(gammas,label='3V Algorithm',color="green",linestyle=(5, (5, 3)),linewidth=linewidth)
 
 Path = MatchPath(Algo4V,ct,CpInit,CsInit,FREQ,0,2,3)
-plt.plot(gammas,label='4V Algorithm',color="blue",linestyle=(3, (5, 3)))
+plt.plot(gammas,label='4V Algorithm',color="blue",linestyle=(3, (5, 3)),linewidth=linewidth)
 
 Path = MatchPath(DirCoupler,ct,CpInit,CsInit,FREQ,0,2,3)
-plt.plot(gammas,label='Dir Coupler Algorithm',color="black",linestyle=(1, (5, 3)))
+plt.plot(gammas,label='Dir Coupler Algorithm',color="black",linestyle=(1, (5, 3)),linewidth=linewidth)
 
 plt.legend(loc="upper right")
 

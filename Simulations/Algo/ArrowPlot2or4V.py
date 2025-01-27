@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import spatial
 import matplotlib.pyplot as plt
+four4 = True
 
 def wave(Gamma,beta):
     return np.abs(np.exp(-1j*x*beta) + Gamma*np.exp(1j*x*beta))
@@ -28,11 +29,14 @@ x = np.linspace(0,2.59,1000)
 VoltMeterPositions = np.array([0.235,0.895,1.69,2.35,0]) #added V+/V- as bonus measurement 
 #x = np.linspace(0,6,1000)
 #VoltMeterPositions = np.array([0.235,0.895,1.69,2.35,0])*6/2.59
+X = []
+W = []
+Z = []
 
 f = 25e6
 
-for i in np.linspace(-1,1,30):
-    for j in np.linspace(-1,1,30):
+for i in np.linspace(-1,1,20):
+    for j in np.linspace(-1,1,20):
         if i**2 + j**2 > 1:
             continue
         Gamma = i + 1j*j
@@ -45,7 +49,7 @@ for i in np.linspace(-1,1,30):
 
         Vf = 1
 
-        Vs = (np.abs(V)**2)/(np.abs(Vf)**2) 
+        Vs = (np.abs(V)**2)/(np.abs(Vf)**2) - 1
 
         S = np.sin(2*beta*VoltMeterPositions) #array
         C = np.cos(2*beta*VoltMeterPositions) #array
@@ -53,24 +57,37 @@ for i in np.linspace(-1,1,30):
         BigS = (S[0] - S[1])/(S[2] - S[3])
         BigC = (C[0] - C[1])/(C[2] - C[3])
 
-        u = (1/2)*((Vs[0] - Vs[1]) - (Vs[2] - Vs[3])*BigS)/((C[2] - C[3])*(BigC - BigS))
-        v = (1/2)*((Vs[0] - Vs[2]) - (Vs[1] - Vs[3])*BigC)/((S[2] - S[3])*(BigC - BigS))
+        if four4:
+            u = (1/2)*((Vs[0] - Vs[1]) - (Vs[2] - Vs[3])*BigS)/((C[2] - C[3])*(BigC - BigS))
+            v = (1/2)*((Vs[0] - Vs[1]) - (Vs[2] - Vs[3])*BigC)/((S[2] - S[3])*(BigC - BigS))
+        else:
+            u = (1/2)*(Vs[0]*(1 - S[1]) - Vs[1]*(1 - S[0]))/( (1+C[0])*(1-S[1]) - (1+C[1])*(1-S[0]) )
+            v = (-1/2)*(Vs[0]*(1 - C[1]) - Vs[1]*(1 - C[0]))/( (1+C[0])*(1-S[1]) - (1+C[1])*(1-S[0]) )
 
-        RYCorr = u**2 + v**2 + u
-        IYCorr = v
-        
+        RYCorr = 1 - (1 - u**2 - v**2)/((1+u)**2 + v**2)
+        IYCorr = 2*v/((1+u)**2 + v**2)
+
         Y_n = Y + RYCorr + 1j*IYCorr
         NewGamma = (1 - Y_n)/(1 + Y_n)
         EpsG = NewGamma.real - Gamma.real 
         EpsA = NewGamma.imag - Gamma.imag
+        X.append(Gamma.real)
+        W.append(Gamma.imag)
+        Z.append(NewGamma)
 
         plt.quiver(i,j,EpsG,EpsA)
 
 #plt.title("Algorithm using voltage probes 0-3 at 25MHz")
-plt.title("u and v from 3V, 4V or directional coupler")
+if four4:
+    plt.title("u and v from 3V, 4V or directional coupler")
+else:
+    plt.title("Corrections using linearized algorithm used in TEXTOR")
 plt.xlabel("$\Re\{\Gamma\}$")
 plt.ylabel("$\Im\{\Gamma\}$")
 plt.show()
+#plt.clf()
+#plt.contour([X, W,], Z)
+#plt.show()
 
 for i in np.linspace(-2,2,30):
     for j in np.linspace(-2,2,30):
@@ -83,7 +100,7 @@ for i in np.linspace(-2,2,30):
             V[k] = wave(Gamma,beta)[np.abs(x-VoltMeterPosition).argmin()]
 
         Vf = 1
-        Vs = (np.abs(V)**2)/(np.abs(Vf)**2) 
+        Vs = (np.abs(V)**2)/(np.abs(Vf)**2) - 1
 
         S = np.sin(2*beta*VoltMeterPositions) #array
         C = np.cos(2*beta*VoltMeterPositions) #array
@@ -91,16 +108,18 @@ for i in np.linspace(-2,2,30):
         BigS = (S[0] - S[1])/(S[2] - S[3])
         BigC = (C[0] - C[1])/(C[2] - C[3])
 
-        u = (1/2)*((Vs[0] - Vs[1]) - (Vs[2] - Vs[3])*BigS)/((C[2] - C[3])*(BigC - BigS))
-        v = (1/2)*((Vs[0] - Vs[1]) - (Vs[2] - Vs[3])*BigC)/((S[2] - S[3])*(BigC - BigS))
+        if four4:
+            u = (1/2)*((Vs[0] - Vs[1]) - (Vs[2] - Vs[3])*BigS)/((C[2] - C[3])*(BigC - BigS))
+            v = (1/2)*((Vs[0] - Vs[1]) - (Vs[2] - Vs[3])*BigC)/((S[2] - S[3])*(BigC - BigS))
+        else:
+            u = (1/2)*(Vs[0]*(1 - S[1]) - Vs[1]*(1 - S[0]))/( (1+C[0])*(1-S[1]) - (1+C[1])*(1-S[0]) )
+            v = (-1/2)*(Vs[0]*(1 - C[1]) - Vs[1]*(1 - C[0]))/( (1+C[0])*(1-S[1]) - (1+C[1])*(1-S[0]) )
 
-
+        RYCorr = 1 - (1 - u**2 - v**2)/((1+u)**2 + v**2)
         IYCorr = 2*v/((1+u)**2 + v**2)
-        RYCorr = 1 - ((1-u**2-v**2)/((1+u)**2 + v**2))
 
         plt.quiver(i,j,RYCorr,IYCorr)
 
-plt.title("New Algorithm")
 plt.xlabel("$\Re\{y\}$")
 plt.ylabel("$\Im\{y\}$")
 plt.show()

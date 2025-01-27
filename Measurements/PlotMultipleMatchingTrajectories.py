@@ -18,7 +18,7 @@ from tkinter import *
 from tkinter import StringVar, OptionMenu
 from tkinter.messagebox import showinfo
 
-matplotlib.use('module://matplotlib-backend-kitty')
+#matplotlib.use('module://matplotlib-backend-kitty')
 
 def find_nearest(array, value):
     array = np.asarray(array)
@@ -37,7 +37,7 @@ def PlotFile(selection):
         for i,key in enumerate(keys):
             x = data[0]['data'][:,0]
             y = data[0]['data'][:,i]
-            plt.plot(x,y,label=key)
+            plt.plot(x,y,linewidth=3,label=f'Initial Position {i}')
             plt.xlabel("time (s)")
             plt.ylabel("Voltage")
             plt.legend()
@@ -94,7 +94,7 @@ def SelectSignals(ToRead,convert,GasType):
     btn.pack(side='bottom')
     listbox.pack()
 
-def add_arrow(line, position=None, direction='right', size=15, color=None):
+def add_arrow(line, position=None, direction='right', size=25, color=None):
     """
     add an arrow to a line.
 
@@ -214,9 +214,10 @@ def CapacitorTrajectory(FolderLocations):
     plt.tricontour(X,Y,Z,levels=levels,linewidths=0.5,colors='k',extend='max')
     plt.tricontourf(X,Y,Z,levels=levels,extend='max')
     for i,Trajectory in enumerate(Trajectories):
-        Traj=plt.plot(Trajectory[0,:],Trajectory[1,:],label=foldernames[i])[0]
+        Traj=plt.plot(Trajectory[0,:],Trajectory[1,:],linewidth=5,label=f'Initial Position nr.{i}')[0]
         add_arrow(Traj)
-    plt.colorbar()
+    colorbar = plt.colorbar()
+    colorbar.set_label("$\mid\Gamma\mid$",rotation=0,labelpad=10)
     plt.legend()
     plt.savefig('figures/CapacitorPath.pdf')
     plt.show()

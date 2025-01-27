@@ -122,6 +122,91 @@ def ArthurMod(CaVal=150*1e-12,CpVal=47.94*1e-12,CsVal=133*1e-12):
     return ct
 
 
+def AntennaAndCaps(CaVal=150*1e-12,CpVal=47.94*1e-12,CsVal=133*1e-12):
+    Zbase = 50
+    ct = rfCircuit(Zbase = Zbase)
+
+    # antenna strap
+
+    A2Ca1_L = 0.95 #Antenna to pre-matching capacitor length
+    A2Ca1_Z = 50
+    T2Cs1_L = 0.087
+    T2Cs1_Z = 50
+
+    tsStrap = 'Ansys/TOMAS_plasma_box_HFSSDesign9.s2p'
+
+    strap = rfObject(touchstone=tsStrap, ports=['cap','t'])
+
+    if strap.fs[0] == 0.:
+        strap.fs[0] = 1e-3 # avoid divisions by 0 at 0 Hz in deembed
+
+    strap.deembed({'cap':(A2Ca1_L, A2Ca1_Z), 
+                        't'  :(T2Cs1_L, T2Cs1_Z)})
+            
+    # circuit
+    T2Cs_L = 0.16
+    T2Cs_Z = 50
+    Cs2Cp_L = 0.2
+    Cs2Cp_Z = 50
+    A2Ca_L = 0.29
+    A2Ca_Z = 50.
+    CptoV0_Z = 50
+    V0toV1_Z = 50
+    V1toV2_Z = 50
+    V2toV3_Z = 50
+    V3toIn_Z = 50
+
+    CptoV0_L = 0.235
+    V0toV1_L = 0.66
+    V1toV2_L = 0.795
+    V2toV3_L = 0.66
+    V3toIn_L = 0.235
+
+    LsCaps_H = 30e-9
+
+    # build the circuit
+    ct.addblock('strap', strap, 
+                     # ports=['t','cap']
+                     )
+    ct.addblock('A2Ca1',
+        rfTRL(L=A2Ca1_L, Z0TL=A2Ca1_Z,
+        ports= ['ant','vcw'])
+    )
+
+    ct.connect('A2Ca1.ant','strap.cap')
+
+    ct.addblock('A2Ca', 
+        rfTRL(L=A2Ca_L, Z0TL=A2Ca_Z,
+        ports= ['vcw','cap'])
+    )
+    ct.connect('A2Ca1.vcw', 'A2Ca.vcw')
+    ct.addblock('Ca', rfRLC(Cs=CaVal, Ls=LsCaps_H, ports= ['cap','sc']))
+    ct.connect('Ca.cap', 'A2Ca.cap')
+    ct.terminate('Ca.sc',Z=0.)
+    ct.addblock('T2Cs1',
+        rfTRL(L=T2Cs1_L, Z0TL=T2Cs1_Z,
+        ports= ['t','vcw'])
+    )
+    ct.connect('strap.t', 'T2Cs1.t')
+    ct.addblock('T2Cs',
+        rfTRL(L=T2Cs_L, Z0TL=T2Cs_Z,
+        ports= ['vcw','cap'])
+    )
+    ct.connect('T2Cs1.vcw', 'T2Cs.vcw')
+    ct.addblock('Cs', rfRLC(Cs=CsVal, Ls=LsCaps_H, ports= ['cap','toCp']))
+    ct.connect('T2Cs.cap','Cs.cap')
+    ct.addblock('Cs2Cp',
+        rfTRL(L=Cs2Cp_L, Z0TL=Cs2Cp_Z,
+        ports= ['Cs','Cp'])
+    )
+    ct.connect('Cs.toCp', 'Cs2Cp.Cs')
+    ct.addblock('Cp', rfRLC(Cs=CpVal, Ls=LsCaps_H, ports= ['Cp','sc']))
+    ct.terminate('Cp.sc', Z=0)
+
+
+    ct.connect('Cs2Cp.Cp', 'Cp.Cp')
+
+    return ct
 
 def FredericCircuit(CaVal=150*1e-12,CpVal=47.94*1e-12,CsVal=133*1e-12,WhichStrap=0):
     Zbase = 50

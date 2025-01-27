@@ -6,7 +6,7 @@ from scipy import spatial, optimize
 from pyRFtk import rfCircuit, rfTRL, rfRLC, rfObject, rfCoupler
 from pyRFtk import plotVSWs
 from scipy.stats import qmc
-from TomasCircuit import TomasCircuit
+from TomasCircuit import ArthurMod as TomasCircuit
 from alive_progress import alive_bar
 
 MHz_ = 1e6
@@ -41,7 +41,7 @@ with alive_bar(len(CsVals)*len(CpVals),title="making a Gamma(Cs,Cp) plot and a m
             ct.set('Cs.Cs',CsVal)
             ct.set('Cp.Cs',CpVal)
 
-            Solution = ct.Solution(f=FREQ, E={'Source': np.sqrt(2*50*1.5*1E3)}, nodes=['V0toV1','V2toV3','Cs','Cp','Ca'])
+            Solution = ct.Solution(f=FREQ, E={'Source': np.sqrt(2*50*1.5*1E3)}, nodes=['V1toV0','V3toV2','Cs','Cp','Ca'])
             # power range: 1000-6000W i.e 10log_10(1000/10e-3W)dBm - 10log_10(6000/10e-3W)dBm
             # Or 115.13dBm - 133.0468dBm
             # But pyRFtk works with E=Vpeak, i.e E=Vpeak= sqrt(2*P_avg*R) = sqrt(2*Z_char*P_avg)
@@ -52,8 +52,8 @@ with alive_bar(len(CsVals)*len(CpVals),title="making a Gamma(Cs,Cp) plot and a m
 
             Iratios.append(max(np.array([rICa,rICp,rICs])))
 
-            Vf = abs(Solution['V2toV3.V3'][2])
-            Vr = abs(Solution['V2toV3.V3'][3])
+            Vf = abs(Solution['V3toV2.V3'][2])
+            Vr = abs(Solution['V3toV2.V3'][3])
 
             Gammas.append(Vr/Vf)
 
